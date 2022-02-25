@@ -73,26 +73,29 @@ func (p *Parameters) UnmarshalBinary(data []byte) (err error) {
 }
 
 // RotationsForBootstrapping returns the list of rotations performed during the Bootstrapping operation.
-func (p *Parameters) RotationsForBootstrapping(LogN, LogSlots int) (rotations []int) {
+func (p *Parameters) RotationsForBootstrapping(params ckks.Parameters) (rotations []int) {
+
+	logN := params.LogN()
+	logSlots := params.LogSlots()
 
 	// List of the rotation key values to needed for the bootstrapp
 	rotations = []int{}
 
-	slots := 1 << LogSlots
-	dslots := slots
-	if LogSlots < LogN-1 {
-		dslots <<= 1
-	}
-
 	//SubSum rotation needed X -> Y^slots rotations
-	for i := LogSlots; i < LogN-1; i++ {
+	for i := logSlots; i < logN-1; i++ {
 		if !utils.IsInSliceInt(1<<i, rotations) {
 			rotations = append(rotations, 1<<i)
 		}
 	}
 
-	rotations = append(rotations, p.CoeffsToSlotsParameters.Rotations(LogN, LogSlots)...)
-	rotations = append(rotations, p.SlotsToCoeffsParameters.Rotations(LogN, LogSlots)...)
+	p.CoeffsToSlotsParameters.LogN = logN
+	p.SlotsToCoeffsParameters.LogN = logN
+
+	p.CoeffsToSlotsParameters.LogSlots = logSlots
+	p.SlotsToCoeffsParameters.LogSlots = logSlots
+
+	rotations = append(rotations, p.CoeffsToSlotsParameters.Rotations()...)
+	rotations = append(rotations, p.SlotsToCoeffsParameters.Rotations()...)
 
 	return
 }
@@ -300,6 +303,7 @@ var DefaultParameters = []Parameters{
 	{
 		SlotsToCoeffsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.SlotsToCoeffs,
+			RepackImag2Real:     true,
 			LevelStart:          12,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -322,6 +326,7 @@ var DefaultParameters = []Parameters{
 		},
 		CoeffsToSlotsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.CoeffsToSlots,
+			RepackImag2Real:     true,
 			LevelStart:          24,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -339,6 +344,7 @@ var DefaultParameters = []Parameters{
 	{
 		SlotsToCoeffsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.SlotsToCoeffs,
+			RepackImag2Real:     true,
 			LevelStart:          8,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -361,6 +367,7 @@ var DefaultParameters = []Parameters{
 		},
 		CoeffsToSlotsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.CoeffsToSlots,
+			RepackImag2Real:     true,
 			LevelStart:          23,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -378,6 +385,7 @@ var DefaultParameters = []Parameters{
 	{
 		SlotsToCoeffsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.SlotsToCoeffs,
+			RepackImag2Real:     true,
 			LevelStart:          9,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -399,6 +407,7 @@ var DefaultParameters = []Parameters{
 		},
 		CoeffsToSlotsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.CoeffsToSlots,
+			RepackImag2Real:     true,
 			LevelStart:          21,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -416,6 +425,7 @@ var DefaultParameters = []Parameters{
 	{
 		SlotsToCoeffsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.SlotsToCoeffs,
+			RepackImag2Real:     true,
 			LevelStart:          11,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -437,6 +447,7 @@ var DefaultParameters = []Parameters{
 		},
 		CoeffsToSlotsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.CoeffsToSlots,
+			RepackImag2Real:     true,
 			LevelStart:          27,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -454,6 +465,7 @@ var DefaultParameters = []Parameters{
 	{
 		SlotsToCoeffsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.SlotsToCoeffs,
+			RepackImag2Real:     true,
 			LevelStart:          3,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
@@ -474,6 +486,7 @@ var DefaultParameters = []Parameters{
 		},
 		CoeffsToSlotsParameters: advanced.EncodingMatrixLiteral{
 			LinearTransformType: advanced.CoeffsToSlots,
+			RepackImag2Real:     true,
 			LevelStart:          13,
 			BSGSRatio:           2.0,
 			BitReversed:         false,
